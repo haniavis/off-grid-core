@@ -21,7 +21,7 @@ CC_NAME="$6"
 : ${LANGUAGE:="golang"}
 : ${TIMEOUT:="10"}
 : ${VERBOSE:="false"}
-: ${NO_CHAINCODE:="false"}
+: ${NO_CHAINCODE:="true"}
 : ${CC_NAME:="chaincode_example02"}
 LANGUAGE=`echo "$LANGUAGE" | tr [:upper:] [:lower:]`
 COUNTER=1
@@ -87,10 +87,10 @@ echo "Having all peers join the channel..."
 joinChannel
 
 ## Set the anchor peers for each org in the channel
-echo "Updating anchor peers for org1..."
-updateAnchorPeers 0 1
-echo "Updating anchor peers for org2..."
-updateAnchorPeers 0 2
+#echo "Updating anchor peers for org1..."
+#updateAnchorPeers 0 1
+#echo "Updating anchor peers for org2..."
+#updateAnchorPeers 0 2
 
 if [ "${NO_CHAINCODE}" != "true" ]; then
 

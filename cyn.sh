@@ -369,6 +369,8 @@ function generateCerts() {
     exit 1
   fi
   echo
+  echo "Generate CCP files for Org1 and Org2"
+  ./ccp-generate.sh
 }
 
 # The `configtxgen tool is used to create four artifacts: orderer **bootstrap
@@ -482,6 +484,108 @@ function generateChannelArtifacts() {
   echo
 }
 
+function installCC() {
+
+  docker exec cli scripts/installCC.sh $PEER $ORG $CC_NAME $CC_VERSION $CC_SRC_PATH
+  if [ $? -ne 0 ]; then
+    echo "ERROR !!!! Chainode installation failed"
+    exit 1
+  fi
+
+}
+
+function joinChannel() {
+
+  #createChannel $CHANNEL_NAME
+  docker exec cli scripts/joinChannel.sh $PEER $ORG $CHANNEL_NAME
+  if [ $? -ne 0 ]; then
+    echo "ERROR !!!! Joining Channel failed"
+    exit 1
+  fi
+}
+
+function genArtifactsAgain() {
+  which configtxgen
+  if [ "$?" -ne 0 ]; then
+    echo "configtxgen tool not found. exiting"
+    exit 1
+  fi
+
+#  CHANNEL=$1
+#  echo "##########################################################"
+#  echo "#########  Generating Orderer Genesis block ##############"
+#  echo "##########################################################"
+#  # Note: For some unknown reason (at least for now) the block file can't be
+#  # named orderer.genesis.block or the orderer will fail to launch!
+#  echo "CONSENSUS_TYPE="$CONSENSUS_TYPE
+#  set -x
+#  if [ "$CONSENSUS_TYPE" == "solo" ]; then
+#    configtxgen -profile TwoOrgsOrdererGenesis -channelID $SYS_CHANNEL -outputBlock ./genesis.block
+#  elif [ "$CONSENSUS_TYPE" == "kafka" ]; then
+#    configtxgen -profile SampleDevModeKafka -channelID $SYS_CHANNEL -outputBlock ./channel-artifacts/genesis.block
+#  elif [ "$CONSENSUS_TYPE" == "etcdraft" ]; then
+#    configtxgen -profile SampleMultiNodeEtcdRaft -channelID $SYS_CHANNEL -outputBlock ./channel-artifacts/genesis.block
+#  else
+#    set +x
+#    echo "unrecognized CONSESUS_TYPE='$CONSENSUS_TYPE'. exiting"
+#    exit 1
+#  fi
+#  res=$?
+#  set +x
+#  if [ $res -ne 0 ]; then
+#    echo "Failed to generate orderer genesis block..."
+#    exit 1
+#  fi
+#  echo
+  echo "#################################################################"
+  echo "### Generating channel configuration transaction 'channel.tx' ###"
+  echo "#################################################################"
+  set -x
+  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel.tx -channelID $CHANNEL_NAME
+  res=$?
+  set +x
+  if [ $res -ne 0 ]; then
+    echo "Failed to generate channel configuration transaction..."
+    exit 1
+  fi
+
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for Org1MSP   ##########"
+  echo "#################################################################"
+  set -x
+  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP
+  res=$?
+  set +x
+  if [ $res -ne 0 ]; then
+    echo "Failed to generate anchor peer update for Org1MSP..."
+    exit 1
+  fi
+
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for Org2MSP   ##########"
+  echo "#################################################################"
+  set -x
+  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate \
+    ./Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP
+  res=$?
+  set +x
+  if [ $res -ne 0 ]; then
+    echo "Failed to generate anchor peer update for Org2MSP..."
+    exit 1
+  fi
+  echo
+
+
+  echo "Copying new channel artifacts in CLI container"
+  docker cp channel.tx cli:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/
+ # docker cp configtx.tx cli:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/
+  echo "Deleting channel artifacts"
+  rm channel.tx
+}
+
+
 # Obtain the OS and Architecture string that will be used to select the correct
 # native binaries for your platform, e.g., darwin-amd64 or linux-amd64
 OS_ARCH=$(echo "$(uname -s | tr '[:upper:]' '[:lower:]' | sed 's/mingw64_nt.*/windows/')-$(uname -m | sed 's/x86_64/amd64/g')" | awk '{print tolower($0)}')
@@ -530,12 +634,16 @@ elif [ "$MODE" == "generate" ]; then
   EXPMODE="Generating certs and genesis block"
 elif [ "$MODE" == "upgrade" ]; then
   EXPMODE="Upgrading the network"
+elif [ "$MODE" == "cc" ]; then
+  EXPMODE="Installing Chainode"
+elif [ "$MODE" == "join" ]; then
+  EXPMODE="Joining Peer in Channel"
 else
   printHelp
   exit 1
 fi
 
-while getopts "h?c:t:d:f:s:l:i:o:k:anv" opt; do
+while getopts "h?c:t:d:f:s:p:r:i:o:n:v:aw" opt; do
   case "$opt" in
   h | \?)
     printHelp
@@ -556,27 +664,30 @@ while getopts "h?c:t:d:f:s:l:i:o:k:anv" opt; do
   s)
     IF_COUCHDB=$OPTARG
     ;;
-  l)
-    LANGUAGE=$OPTARG
+  p)
+    PEER=$OPTARG
     ;;
-  i)
-    IMAGETAG=$(go env GOARCH)"-"$OPTARG
+  r)
+    ORG=$OPTARG
     ;;
   o)
     CONSENSUS_TYPE=$OPTARG
     ;;
-  k)
+  n)
     CC_NAME=$OPTARG
+    ;;
+  v)
+    CC_VERSION=$OPTARG
     ;;
   a)
     CERTIFICATE_AUTHORITIES=true
     ;;
-  n)
+  w)
     NO_CHAINCODE=true
     ;;
-  v)
-    VERBOSE=true
-    ;;
+#  v)
+#    VERBOSE=true
+#    ;;
   esac
 done
 
@@ -594,7 +705,7 @@ askProceed
 
 #Create the network using docker compose
 if [ "${MODE}" == "up" ]; then
-  networkUp 
+  networkUp
 elif [ "${MODE}" == "down" ]; then ## Clear the network
   networkDown
 elif [ "${MODE}" == "generate" ]; then ## Generate Artifacts
@@ -606,6 +717,10 @@ elif [ "${MODE}" == "restart" ]; then ## Restart the network
   networkUp
 elif [ "${MODE}" == "upgrade" ]; then ## Upgrade the network from version 1.2.x to 1.3.x
   upgradeNetwork
+elif [ "${MODE}" == "cc" ]; then ## Install Chaincode
+  installCC
+elif [ "${MODE}" == "join" ]; then ## Join peer in Channel
+  joinChannel
 else
   printHelp
   exit 1

@@ -29,6 +29,7 @@ setOrdererGlobals() {
 }
 
 setGlobals() {
+  #echo "setGlobals is called!"
   PEER=$1
   ORG=$2
   if [ $ORG -eq 1 ]; then
@@ -96,6 +97,7 @@ joinChannelWithRetry() {
   PEER=$1
   ORG=$2
   setGlobals $PEER $ORG
+  echo $CHANNEL_NAME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
   set -x
   peer channel join -b $CHANNEL_NAME.block >&log.txt
