@@ -1,7 +1,22 @@
-## Build Your First Network (BYFN)
+## Configure Your Fabric Network (CYFN)
+========================================
 
-The directions for using this are documented in the Hyperledger Fabric
-["Build Your First Network"](http://hyperledger-fabric.readthedocs.io/en/latest/build_network.html) tutorial.
+This is a Command Line Iterface (CLI) for administrators of Fabric networks. It 
 
-*NOTE:* After navigating to the documentation, choose the documentation version that matches your version of Fabric
 
+Prerequirements
+-----------------
+To be filled
+
+
+Installation
+------------
+
+To be filled
+
+Guide
+------
+
+License
+--------
+See the [LICENSE](https://github.com/off-grid-block/off-grid-net/blob/master/LICENSE) file for license rights and limitations (MIT).
