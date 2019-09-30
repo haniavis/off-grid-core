@@ -29,7 +29,7 @@ setOrdererGlobals() {
 }
 
 setGlobals() {
-  #echo "setGlobals is called!"
+  echo "setGlobals is called!"
   PEER=$1
   ORG=$2
   if [ $ORG -eq 1 ]; then

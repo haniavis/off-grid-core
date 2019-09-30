@@ -42,7 +42,7 @@ if [ "$LANGUAGE" = "java" ]; then
 	CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/java/"
 fi
 
-echo "Channel name : "$CHANNEL_NAME
+#echo "Channel name : "$CHANNEL_NAME
 
 # import utils
 . scripts/utils.sh
@@ -79,12 +79,12 @@ joinChannel () {
 }
 
 ## Create channel
-echo "Creating channel..."
-createChannel
+#echo "Creating channel..."
+#createChannel
 
 ## Join all the peers to the channel
-echo "Having all peers join the channel..."
-joinChannel
+#echo "Having all peers join the channel..."
+#joinChannel
 
 ## Set the anchor peers for each org in the channel
 #echo "Updating anchor peers for org1..."
