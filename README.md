@@ -7,16 +7,17 @@ This is a Command Line Iterface (CLI) for administrators of Fabric networks. It 
 
 Prerequirements
 -----------------
-To be filled
-
+Hyperledger fabric-samples repository 
 
 Installation
 ------------
+Follow instructions for installation of fabric-samples.
+Clone this repo
 
-To be filled
 
 Guide
 ------
+
 
 License
 --------
