@@ -14,14 +14,14 @@ DELAY="$2"
 LANGUAGE="$3"
 TIMEOUT="$4"
 VERBOSE="$5"
-NO_CHAINCODE="$7"
+WITH_CHAINCODE="$7"
 CC_NAME="$6"
 : ${CHANNEL_NAME:="mychannel"}
 : ${DELAY:="3"}
 : ${LANGUAGE:="golang"}
 : ${TIMEOUT:="10"}
 : ${VERBOSE:="false"}
-: ${NO_CHAINCODE:="true"}
+: ${WITH_CHAINCODE:="no"}
 : ${CC_NAME:="chaincode_example02"}
 LANGUAGE=`echo "$LANGUAGE" | tr [:upper:] [:lower:]`
 COUNTER=1
@@ -92,7 +92,7 @@ joinChannel () {
 #echo "Updating anchor peers for org2..."
 #updateAnchorPeers 0 2
 
-if [ "${NO_CHAINCODE}" != "true" ]; then
+if [ "${WITH_CHAINCODE}" != "no" ]; then
 
 	## Install chaincode on peer0.org1 and peer0.org2
 	echo "Installing chaincode on peer0.org1..."

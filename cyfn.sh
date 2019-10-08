@@ -156,7 +156,7 @@ function checkPrereqs() {
 
 # Generate the needed certificates, the genesis block and start the network.
 function networkUp() {
-  #NO_CHAINCODE=false
+  
   checkPrereqs
   # generate artifacts if they don't exist
   if [ ! -d "crypto-config" ]; then
@@ -198,7 +198,7 @@ function networkUp() {
   fi
 
   # now run the end to end script
-  docker exec cli scripts/script.sh $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE $CC_NAME $NO_CHAINCODE
+  docker exec cli scripts/script.sh $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE $CC_NAME $WITH_CHAINCODE
   if [ $? -ne 0 ]; then
     echo "ERROR !!!! Test failed"
     exit 1
@@ -501,8 +501,6 @@ function installCC() {
 
 function joinChannel() {
 
-  #echo "channel name inside function joinChannel: $CHANNEL_NAME"
-  #createChannel $CHANNEL_NAME
   docker exec cli scripts/joinChannel.sh $PEER $ORG $CHANNEL_NAME
   if [ $? -ne 0 ]; then
     echo "ERROR !!!! Joining Channel failed"
@@ -603,7 +601,7 @@ CLI_DELAY=3
 # system channel name defaults to "byfn-sys-channel"
 SYS_CHANNEL="byfn-sys-channel"
 # channel name defaults to "mychannel"
-CHANNEL_NAME="mychannel"
+#CHANNEL_NAME="mychannel"
 # use this as the default docker-compose yaml definition
 COMPOSE_FILE=docker-compose-cli.yaml
 #
@@ -691,7 +689,7 @@ while getopts "h?c:t:d:f:s:p:r:i:o:n:v:aw" opt; do
     CERTIFICATE_AUTHORITIES=true
     ;;
   w)
-    NO_CHAINCODE=true
+    WITH_CHAINCODE=true
     ;;
 #  v)
 #    VERBOSE=true
@@ -728,8 +726,16 @@ elif [ "${MODE}" == "upgrade" ]; then ## Upgrade the network from version 1.2.x 
 elif [ "${MODE}" == "cc" ]; then ## Install Chaincode
   installCC
 elif [ "${MODE}" == "channel" ]; then ## Create Channel artifacts
+  if [ $CHANNEL_NAME -z ]; then
+    echo "ERROR !!! You have to specify the channel name (-c)"
+    exit 1
+  fi
   genArtifactsAgain
 elif [ "${MODE}" == "join" ]; then ## Join peer in Channel
+  if [ $PEER -z ] || [ $ORG -z ] || [ $CHANNEL_NAME -z ]; then
+    echo "ERROR !!! You have to specify the peer (-p) the org (-r) and the channel name (-c)"
+    exit 1
+  fi
   genArtifactsAgain
   joinChannel
 else
