@@ -711,10 +711,18 @@ askProceed
 
 #Create the network using docker compose
 if [ "${MODE}" == "up" ]; then
+  if [ -z $CHANNEL_NAME ]; then
+    echo "ERROR !!! You have to specify the channel name (-c)"
+    exit 1
+  fi
   networkUp
 elif [ "${MODE}" == "down" ]; then ## Clear the network
   networkDown
 elif [ "${MODE}" == "generate" ]; then ## Generate Artifacts
+  if [ -z "$CHANNEL_NAME" ]; then
+    echo "ERROR !!! You have to specify the channel name (-c)"
+    exit 1
+  fi
   generateCerts
   replacePrivateKey
   generateChannelArtifacts
@@ -726,13 +734,13 @@ elif [ "${MODE}" == "upgrade" ]; then ## Upgrade the network from version 1.2.x 
 elif [ "${MODE}" == "cc" ]; then ## Install Chaincode
   installCC
 elif [ "${MODE}" == "channel" ]; then ## Create Channel artifacts
-  if [ $CHANNEL_NAME -z ]; then
+  if [ -z $CHANNEL_NAME ]; then
     echo "ERROR !!! You have to specify the channel name (-c)"
     exit 1
   fi
   genArtifactsAgain
 elif [ "${MODE}" == "join" ]; then ## Join peer in Channel
-  if [ $PEER -z ] || [ $ORG -z ] || [ $CHANNEL_NAME -z ]; then
+  if [ $PEER -z ] || [ $ORG -z ] || [ -z $CHANNEL_NAME ]; then
     echo "ERROR !!! You have to specify the peer (-p) the org (-r) and the channel name (-c)"
     exit 1
   fi
