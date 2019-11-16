@@ -92,7 +92,7 @@ function genArtifactsAgain() {
 }
 
 createChannel() {
-        setGlobals 0 1
+        setGlobals $PEER $ORG
 
         if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
                 set -x
@@ -118,7 +118,7 @@ FILE=$CHANNEL_NAME.block
 if test -f "$FILE"; then
     echo "genesis block exists"
     echo "Joining peer: $PEER of org: $ORG in channel: $CHANNEL_NAME"
-    joinChannelWithRetry $PEER $ORG
+    joinChannelWithRetry $PEER $ORG 
     echo "===================== peer$PEER.org$ORG joined channel '$CHANNEL_NAME' ===================== "
 
 else
@@ -126,7 +126,7 @@ else
     echo "for peer: $PEER and org: $ORG"
     createChannel
     echo "Joining peer: $PEER of org: $ORG in channel: $CHANNEL_NAME"
-    joinChannelWithRetry $PEER $ORG
+    joinChannelWithRetry $PEER $ORG 
     echo "===================== peer$PEER.org$ORG joined channel '$CHANNEL_NAME' ===================== "
 fi
 
