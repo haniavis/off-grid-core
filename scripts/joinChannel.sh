@@ -112,10 +112,21 @@ createChannel() {
 }
 
 #genArtifactsAgain
-echo "Creating Channel with name: $CHANNEL_NAME"
-echo "for peer: $PEER and org: $ORG"
-createChannel
-echo "Joining peer: $PEER of org: $ORG in channel: $CHANNEL_NAME"
-joinChannelWithRetry $PEER $ORG 
-echo "===================== peer$PEER.org$ORG joined channel '$CHANNEL_NAME' ===================== "
+FILE=$CHANNEL_NAME.block
+
+# if genesis block exists don't create it again, just join the peer
+if test -f "$FILE"; then
+    echo "genesis block exists"
+    echo "Joining peer: $PEER of org: $ORG in channel: $CHANNEL_NAME"
+    joinChannelWithRetry $PEER $ORG
+    echo "===================== peer$PEER.org$ORG joined channel '$CHANNEL_NAME' ===================== "
+
+else
+    echo "Creating Channel with name: $CHANNEL_NAME"
+    echo "for peer: $PEER and org: $ORG"
+    createChannel
+    echo "Joining peer: $PEER of org: $ORG in channel: $CHANNEL_NAME"
+    joinChannelWithRetry $PEER $ORG
+    echo "===================== peer$PEER.org$ORG joined channel '$CHANNEL_NAME' ===================== "
+fi
 

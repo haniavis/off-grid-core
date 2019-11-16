@@ -97,7 +97,7 @@ joinChannelWithRetry() {
   PEER=$1
   ORG=$2
   setGlobals $PEER $ORG
-  echo $CHANNEL_NAME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+  #echo "channel name inside joinChannelWithRetry" $CHANNEL_NAME !!!
 
   set -x
   peer channel join -b $CHANNEL_NAME.block >&log.txt
