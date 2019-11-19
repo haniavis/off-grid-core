@@ -740,7 +740,7 @@ elif [ "${MODE}" == "channel" ]; then ## Create Channel artifacts
   fi
   genArtifactsAgain
 elif [ "${MODE}" == "join" ]; then ## Join peer in Channel
-  if [ $PEER -z ] || [ $ORG -z ] || [ -z $CHANNEL_NAME ]; then
+  if [ "$PEER" -z ] || [ "$ORG" -z ] || [ -z "$CHANNEL_NAME" ]; then
     echo "ERROR !!! You have to specify the peer (-p) the org (-r) and the channel name (-c)"
     exit 1
   fi
