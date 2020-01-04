@@ -11,6 +11,8 @@ LANGUAGE=golang
 
 if [ "$CC_NAME" = "chaincode_example02" ]; then
         CC_SRC_PATH="github.com/chaincode/$CC_NAME/go/"
+elif [ "$CC_NAME" = "vote" ]; then
+        CC_SRC_PATH="github.com/chaincode/off-grid-cc/vote/"
 else
         CC_SRC_PATH="github.com/chaincode/$CC_NAME/"
 fi

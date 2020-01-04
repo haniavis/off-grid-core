@@ -9,6 +9,7 @@ CHANNEL_NAME=$3
 VERSION=${4:-1.0}
 LANGUAGE=golang
 
+
 createChannel() {
         setGlobals $PEER $ORG
 
@@ -37,6 +38,9 @@ if test -f "$FILE"; then
     echo "Joining peer: $PEER of org: $ORG in channel: $CHANNEL_NAME"
     joinChannelWithRetry $PEER $ORG 
     echo "===================== peer$PEER.org$ORG joined channel '$CHANNEL_NAME' ===================== "
+    # This need to be checked for updating Anchor Peers
+    #updateAnchorPeers $PEER $ORG
+    #echo "Updating anchor peers for org$ORG..."
 
 else
     echo "Creating Channel with name: $CHANNEL_NAME"
@@ -45,5 +49,8 @@ else
     echo "Joining peer: $PEER of org: $ORG in channel: $CHANNEL_NAME"
     joinChannelWithRetry $PEER $ORG 
     echo "===================== peer$PEER.org$ORG joined channel '$CHANNEL_NAME' ===================== "
+    # This need to be checked for updating Anchor Peers
+    #updateAnchorPeers $PEER $ORG
+    #echo "Updating anchor peers for org$ORG..."
 fi
 
